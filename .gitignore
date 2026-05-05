@@ -1,0 +1,16 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+
+# Logs
+npm-debug.log*
+*.log
+
+# macOS
+.DS_Store
+*.iconset
+
+# Electron
+out/

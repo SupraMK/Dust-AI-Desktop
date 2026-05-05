@@ -1,0 +1,42 @@
+{
+  "name": "dust-ai",
+  "version": "1.0.0",
+  "description": "Dust AI — Desktop Client for macOS",
+  "main": "main.js",
+  "author": "Supra",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "electron": "^41.5.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+  "appId": "tt.dust.desktop",
+  "productName": "Dust AI",
+  "copyright": "Supra",
+  "mac": {
+    "category": "public.app-category.productivity",
+    "icon": "assets/icon.icns",
+    "identity": null,
+    "target": [
+      { "target": "dmg", "arch": ["arm64", "x64"] }
+    ]
+  },
+  "dmg": {
+    "title": "Dust AI",
+    "window": { "width": 540, "height": 380 }
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "splash.html",
+    "assets/**/*"
+  ]
+}
+}
