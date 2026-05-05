@@ -16,21 +16,21 @@
 
 ## Aperçu
 
-Application desktop macOS encapsulant [app.dust.tt](https://app.dust.tt), avec authentification SSO Microsoft, tray icon, raccourci global et session persistante.
+Application desktop macOS encapsulant [app.dust.tt](https://app.dust.tt), tray icon, raccourci global et session persistante.
 
 ---
 
 ## Prérequis
 
-- macOS 12 ou supérieur
-- Node.js v18+
+- macOS Intel et Apple Silicon
+- Node.js
 
 ---
 
 ## Démarrage
 
 ```bash
-git clone https://github.com/TON_USERNAME/dust-ai-desktop.git
+git clone https://github.com/SupraMK/dust-ai-desktop.git
 cd dust-ai-desktop
 npm install
 npm start
@@ -53,17 +53,3 @@ Génère un `.dmg` dans `dist/`. À la première ouverture, macOS peut afficher 
 | `⌘ Shift D` | Afficher / Masquer |
 | `⌘ R` | Recharger |
 | `⌘ Q` | Quitter |
-
----
-
-## Debug
-
-Dans `main.js`, ligne 1 :
-
-```javascript
-const DEBUG = true  // false pour désactiver les logs
-```
-
----
-
-© 2026
