@@ -4,7 +4,6 @@
   "description": "Dust AI — Desktop Client for macOS",
   "main": "main.js",
   "author": "Supra",
-  "license": "MIT",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --mac"
