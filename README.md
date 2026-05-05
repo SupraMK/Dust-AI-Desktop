@@ -7,7 +7,7 @@
 <p>Client desktop macOS pour <a href="https://dust.tt">Dust AI</a></p>
 
 ![Platform](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
-![Electron](https://img.shields.io/badge/Electron-29-47848F?logo=electron&logoColor=white)
+![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)
 ![Version](https://img.shields.io/badge/version-1.0.0-000000)
 
 </div>
