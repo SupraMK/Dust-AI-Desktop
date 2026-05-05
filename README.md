@@ -11,7 +11,6 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-000000)
 
 </div>
----
 
 ## Téléchargement
 
