@@ -14,7 +14,7 @@
 
 ## Téléchargement
 
-Une version compilée est disponible directement dans les [**Releases**](https://github.com/SupraMK/dust-ai-desktop/releases) — aucune installation de Node.js requise.
+Une version compilée est disponible directement dans les [**Releases**](https://github.com/SupraMK/dust-ai-desktop/releases) 
 
 ---
 
