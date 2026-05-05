@@ -6,43 +6,22 @@
 
 <p>Client desktop macOS pour <a href="https://dust.tt">Dust AI</a></p>
 
-![Platform](https://img.shields.io/badge/macOS-12+-000000?logo=apple&logoColor=white)
+![Platform](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
 ![Electron](https://img.shields.io/badge/Electron-29-47848F?logo=electron&logoColor=white)
 ![Version](https://img.shields.io/badge/version-1.0.0-000000)
 
 </div>
+---
+
+## Téléchargement
+
+Une version compilée est disponible directement dans les [**Releases**](https://github.com/SupraMK/dust-ai-desktop/releases) — aucune installation de Node.js requise.
 
 ---
 
 ## Aperçu
 
 Application desktop macOS encapsulant [app.dust.tt](https://app.dust.tt), tray icon, raccourci global et session persistante.
-
----
-
-## Prérequis
-
-- macOS Intel et Apple Silicon
-- Node.js
-
----
-
-## Démarrage
-
-```bash
-git clone https://github.com/SupraMK/dust-ai-desktop.git
-cd dust-ai-desktop
-npm install
-npm start
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-Génère un `.dmg` dans `dist/`. À la première ouverture, macOS peut afficher un avertissement — contourne-le via **Clic droit → Ouvrir**.
 
 ---
 
