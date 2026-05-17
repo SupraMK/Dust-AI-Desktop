@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, Menu, Tray, globalShortcut, nativeImage } = require('electron');
+const { app, BrowserWindow, shell, Menu, Tray, globalShortcut, nativeImage, screen } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
 
@@ -13,21 +13,33 @@ let mainWindow = null;
 let splashWindow = null;
 let tray = null;
 const DUST_URL = 'https://app.dust.tt';
-const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
 // ─── Domaines autorisés ────────────────────────────────────────────────────
 const ALLOWED_PATTERNS = [
-  /\.?dust\.tt$/,
-  /\.?workos\.com$/,
-  /\.?microsoftonline\.com$/,
-  /\.?microsoft\.com$/,
-  /\.?live\.com$/,
-  /\.?msauth\.net$/,
-  /\.?msftauth\.net$/,
-  /\.?google\.com$/,
-  /\.?github\.com$/,
-  /\.?okta\.com$/,
+  /(^|\.)dust\.tt$/,
+  /(^|\.)workos\.com$/,
+  /(^|\.)microsoftonline\.com$/,
+  /(^|\.)microsoft\.com$/,
+  /(^|\.)live\.com$/,
+  /(^|\.)msauth\.net$/,
+  /(^|\.)msftauth\.net$/,
+  /(^|\.)google\.com$/,
+  /(^|\.)github\.com$/,
+  /(^|\.)okta\.com$/,
 ];
+
+function getValidBounds(saved) {
+  const displays = screen.getAllDisplays();
+  const isVisible = displays.some(d =>
+    saved.x !== undefined &&
+    saved.x >= d.bounds.x &&
+    saved.y >= d.bounds.y &&
+    saved.x < d.bounds.x + d.bounds.width &&
+    saved.y < d.bounds.y + d.bounds.height
+  );
+  return isVisible ? saved : { width: 1280, height: 860 };
+}
 
 function isAllowedUrl(url) {
   try {
@@ -75,7 +87,8 @@ function createSplash() {
 
 // ─── Fenêtre principale ────────────────────────────────────────────────────
 function createWindow() {
-  const savedBounds = store.get('windowBounds', { width: 1280, height: 860 });
+  const rawBounds = store.get('windowBounds', { width: 1280, height: 860 });
+  const savedBounds = getValidBounds(rawBounds);
 
   mainWindow = new BrowserWindow({
     ...savedBounds,
@@ -103,23 +116,32 @@ function createWindow() {
   });
 
   // ─── Ferme le splash + affiche l'app quand Dust est prêt ────────────
+  let isFirstLoad = true;
+
   mainWindow.webContents.on('did-finish-load', () => {
-    setTimeout(() => {
-      if (splashWindow && !splashWindow.isDestroyed()) {
-        splashWindow.close();
-        splashWindow = null;
-      }
-      mainWindow.show();
-      mainWindow.focus();
-    }, 2000); // légère pause pour un rendu propre
+    if (!isFirstLoad) return;
+    isFirstLoad = false;
+
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.close();
+      splashWindow = null;
+    }
+    mainWindow.show();
+    mainWindow.focus();
   });
 
   mainWindow.on('close', (e) => {
     store.set('windowBounds', mainWindow.getBounds());
-    if (!app.isQuiting) {
+    if (!app.isQuitting) {
       e.preventDefault();
       mainWindow.hide();
     }
+  });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode) => {
+  // -106 = ERR_INTERNET_DISCONNECTED, -3 = aborted (navigation normale), on ignore -3
+  if (errorCode === -3) return;
+  mainWindow.loadFile(path.join(__dirname, 'offline.html'));
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
@@ -132,7 +154,12 @@ function createWindow() {
   });
 
   mainWindow.webContents.on('will-redirect', (event, url) => {
-    log('[REDIRECT]', url.substring(0, 120));
+  log('[REDIRECT]', url.substring(0, 120));
+  if (!isAllowedUrl(url)) {
+    log('[BLOCKED REDIRECT → external]', url.substring(0, 120));
+    event.preventDefault();
+    shell.openExternal(url);
+  }
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -155,10 +182,14 @@ function createWindow() {
 // ─── Tray avec icône Template (mode clair/sombre auto) ────────────────────
 function createTray() {
   const iconPath = path.join(__dirname, 'assets', 'tray-icon.png');
+  console.log('[TRAY] iconPath:', iconPath);
 
   const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
+  console.log('[TRAY] icon empty?', trayIcon.isEmpty());
 
+  trayIcon.setTemplateImage(true);
   tray = new Tray(trayIcon);
+  console.log('[TRAY] tray créé ✅');
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -175,7 +206,7 @@ function createTray() {
     {
       label: 'Quitter Dust AI',
       accelerator: 'CmdOrCtrl+Q',
-      click: () => { app.isQuiting = true; app.quit(); }
+      click: () => { app.isQuitting = true; app.quit(); }
     }
   ]);
 
@@ -208,7 +239,7 @@ function createAppMenu() {
         {
           label: 'Quitter Dust AI',
           accelerator: 'CmdOrCtrl+Q',
-          click: () => { app.isQuiting = true; app.quit(); }
+          click: () => { app.isQuitting = true; app.quit(); }
         }
       ]
     },
@@ -255,7 +286,7 @@ function createAppMenu() {
 
 // ─── Raccourci global ──────────────────────────────────────────────────────
 function registerShortcuts() {
-  globalShortcut.register('CommandOrControl+Shift+D', () => {
+  const registered = globalShortcut.register('CommandOrControl+Shift+D', () => {
     if (mainWindow.isVisible() && mainWindow.isFocused()) {
       mainWindow.hide();
     } else {
@@ -263,12 +294,16 @@ function registerShortcuts() {
       mainWindow.focus();
     }
   });
+
+  if (!registered) {
+    console.warn('[SHORTCUT] CommandOrControl+Shift+D déjà pris par une autre application');
+  }
 }
 
 // ─── Événements app ────────────────────────────────────────────────────────
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    app.dock.setIcon(path.join(__dirname, 'assets', 'icon.png'));
+    //app.dock.setIcon(path.join(__dirname, 'assets', 'icon.png'));
   }
   createSplash();   // 1. Splash en premier
   createWindow();   // 2. Fenêtre principale en arrière-plan
@@ -290,5 +325,5 @@ app.on('will-quit', () => {
 });
 
 app.on('before-quit', () => {
-  app.isQuiting = true;
+  app.isQuitting = true;
 });

@@ -24,7 +24,7 @@
     "icon": "assets/icon.icns",
     "identity": null,
     "target": [
-      { "target": "dmg", "arch": ["arm64", "x64"] }
+      { "target": "dmg", "arch": ["universal"] }
     ]
   },
   "dmg": {
@@ -34,6 +34,7 @@
   "files": [
     "main.js",
     "preload.js",
+    "offline.html",
     "splash.html",
     "assets/**/*"
   ]
